@@ -7,7 +7,7 @@ https://easybake.finance. Feel free to read the code. More details coming soon.
 
 ## Deployed Contracts / Hash
 
-### BSCMAINNET
+### BSC Main Net
 
 - CakeToken - https://bscscan.com/token/0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82
 - MasterChef - https://bscscan.com/address/0x73feaa1eE314F8c655E354234017bE2193C9E24E
@@ -19,5 +19,5 @@ https://easybake.finance. Feel free to read the code. More details coming soon.
 ### ERC Rinkeby Testnet
 
 - BakeToken.sol - https://rinkeby.etherscan.io/address/0xf2415991d786f9979552ee77284ca196af3b3f95#code
-- SugarBar.sol - 
-- MasterChef.sol - 
+- SugarCrush.sol - https://rinkeby.etherscan.io/address/0xcbefc0c98934ff0824f55aa92fb393e8e96ca8e8#code
+- MasterChef.sol - https://rinkeby.etherscan.io/address/0xd25143501b12cba672d8b273a433ae7836c55488#code
