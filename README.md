@@ -7,10 +7,8 @@ https://easybake.finance. Feel free to read the code. More details coming soon.
 
 ## Deployed Contracts / Hash
 
-### BSC Main Net
+### BSC Mainnet
 
-- CakeToken - https://bscscan.com/token/0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82
-- MasterChef - https://bscscan.com/address/0x73feaa1eE314F8c655E354234017bE2193C9E24E
 - (Uni|Cake)swapV2Factory - https://bscscan.com/address/0xBCfCcbde45cE874adCB698cC183deBcF17952812
 - (Uni|Cake)swapV2Router02 - https://bscscan.com/address/0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F
 - (Uni|Cake)swapV2Pair init code hash - `0xd0d4c4cd0848c93cb4fd1f498d7013ee6bfb25783ea21593d5834f5d250ece66`
@@ -19,5 +17,12 @@ https://easybake.finance. Feel free to read the code. More details coming soon.
 ### ERC Rinkeby Testnet
 
 - BakeToken.sol - https://rinkeby.etherscan.io/address/0xf2415991d786f9979552ee77284ca196af3b3f95#code
-- SugarCrush.sol - https://rinkeby.etherscan.io/address/0xcbefc0c98934ff0824f55aa92fb393e8e96ca8e8#code
 - MasterChef.sol - https://rinkeby.etherscan.io/address/0xd25143501b12cba672d8b273a433ae7836c55488#code
+- Multicall.sol - https://rinkeby.etherscan.io/address/0x1605d633e30f430d54162232571475c620c69da5#code
+
+## Contract Addresses
+
+### ERC Rinkeby Testnet
+- BakeToken - 0xf2415991d786f9979552ee77284ca196af3b3f95
+- MasterChef - 0xd25143501b12cba672d8b273a433ae7836c55488
+- Multicall - 0x1605d633e30f430d54162232571475c620c69da5
