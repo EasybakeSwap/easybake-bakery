@@ -1,8 +1,5 @@
 # Easybake Oven 🍰
 
-[![Actions Status](https://github.com/pancakeswap/pancake-farm/workflows/CI/badge.svg)](https://github.com/pancakeswap/pancake-farm/actions)
-[![codecov](https://codecov.io/gh/pancakeswap/pancake-farm/branch/master/graph/badge.svg?token=5XMLP74IR0)](https://codecov.io/gh/pancakeswap/pancake-farm)
-
 https://easybake.finance. Feel free to read the code. More details coming soon.
 
 ## Deployed Contracts / Hash
@@ -16,13 +13,13 @@ https://easybake.finance. Feel free to read the code. More details coming soon.
 
 ### ERC Rinkeby Testnet
 
-- BakeToken.sol - https://rinkeby.etherscan.io/address/0xf2415991d786f9979552ee77284ca196af3b3f95#code
-- MasterChef.sol - https://rinkeby.etherscan.io/address/0xd25143501b12cba672d8b273a433ae7836c55488#code
+- OvenToken.sol - https://rinkeby.etherscan.io/address/0x814e4eb5963c3b1558d244cfb19bb2480b6d0d62#code
+- MasterChef.sol - https://rinkeby.etherscan.io/address/0xc45c071d1e790228f8541fbd8e38e0f4e57c3564#code
 - Multicall.sol - https://rinkeby.etherscan.io/address/0x1605d633e30f430d54162232571475c620c69da5#code
 
 ## Contract Addresses
 
 ### ERC Rinkeby Testnet
-- BakeToken - 0xf2415991d786f9979552ee77284ca196af3b3f95
-- MasterChef - 0xd25143501b12cba672d8b273a433ae7836c55488
+- BakeToken - 0x814e4eb5963c3b1558d244cfb19bb2480b6d0d62
+- MasterChef - 0xc45c071d1e790228f8541fbd8e38e0f4e57c3564
 - Multicall - 0x1605d633e30f430d54162232571475c620c69da5
