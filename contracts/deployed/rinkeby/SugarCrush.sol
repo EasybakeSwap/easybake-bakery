@@ -1,13 +1,40 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.6.12;
 
-import "@openzeppelin/openzeppelin-contracts/contracts/token/BEP20/BEP20.sol";
+import "./ERC20.sol";
+import "./BakeToken.sol";
 
-// CakeToken with Governance.
-contract BakeToken is BEP20('EasyBake Token', 'Bake') {
+// SugarCrush with Governance.
+contract SugarCrush is ERC20('SugarCrush Token', 'SUGAR') {
     /// @notice Creates `_amount` token to `_to`. Must only be called by the owner (MasterChef).
     function mint(address _to, uint256 _amount) public onlyOwner {
         _mint(_to, _amount);
         _moveDelegates(address(0), _delegates[_to], _amount);
+    }
+
+    function burn(address _from ,uint256 _amount) public onlyOwner {
+        _burn(_from, _amount);
+        _moveDelegates(_delegates[_from], address(0), _amount);
+    }
+
+    // The BAKE TOKEN!
+    BakeToken public bake;
+
+
+    constructor(
+        BakeToken _bake
+    ) public {
+        bake = _bake;
+    }
+
+    // Safe bake transfer function, just in case if rounding error causes pool to not have enough BAKEs.
+    function safeBakeTransfer(address _to, uint256 _amount) public onlyOwner {
+        uint256 bakeBal = bake.balanceOf(address(this));
+        if (_amount > bakeBal) {
+            bake.transfer(_to, bakeBal);
+        } else {
+            bake.transfer(_to, _amount);
+        }
     }
 
     // Copied and modified from YAM code:
@@ -16,7 +43,7 @@ contract BakeToken is BEP20('EasyBake Token', 'Bake') {
     // Which is copied and modified from COMPOUND:
     // https://github.com/compound-finance/compound-protocol/blob/master/contracts/Governance/Comp.sol
 
-    /// @notice A record of each accounts delegate
+    /// @dev A record of each accounts delegate
     mapping (address => address) internal _delegates;
 
     /// @notice A checkpoint for marking number of votes from a given block
