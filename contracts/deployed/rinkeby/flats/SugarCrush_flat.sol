@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // File: browser/Address.sol
 
 pragma solidity >=0.6.2 <0.8.0;
@@ -885,13 +886,12 @@ contract ERC20 is Context, IERC20, Ownable {
     }
 }
 
-// File: browser/BakeToken.sol
-// SPDX-License-Identifier: MIT
+// File: browser/OvenToken.sol
 pragma solidity ^0.6.12;
 
 
-// BAKEToken with Governance.
-contract BakeToken is ERC20('EasyBake Token', 'Bake') {
+// Oven Token with Governance.
+contract OvenToken is ERC20('EasybakeOven Token', 'OVEN') {
     /// @notice Creates `_amount` token to `_to`. Must only be called by the owner (MasterChef).
     function mint(address _to, uint256 _amount) public onlyOwner {
         _mint(_to, _amount);
@@ -999,9 +999,9 @@ contract BakeToken is ERC20('EasyBake Token', 'Bake') {
         );
 
         address signatory = ecrecover(digest, v, r, s);
-        require(signatory != address(0), "BAKE::delegateBySig: invalid signature");
-        require(nonce == nonces[signatory]++, "BAKE::delegateBySig: invalid nonce");
-        require(block.timestamp <= expiry, "BAKE::delegateBySig: signature expired");
+        require(signatory != address(0), "OVEN::delegateBySig: invalid signature");
+        require(nonce == nonces[signatory]++, "OVEN::delegateBySig: invalid nonce");
+        require(block.timestamp <= expiry, "OVEN::delegateBySig: signature expired");
         return _delegate(signatory, delegatee);
     }
 
@@ -1031,7 +1031,7 @@ contract BakeToken is ERC20('EasyBake Token', 'Bake') {
         view
         returns (uint256)
     {
-        require(blockNumber < block.number, "BAKE::getPriorVotes: not yet determined");
+        require(blockNumber < block.number, "OVEN::getPriorVotes: not yet determined");
 
         uint32 nCheckpoints = numCheckpoints[account];
         if (nCheckpoints == 0) {
@@ -1068,7 +1068,7 @@ contract BakeToken is ERC20('EasyBake Token', 'Bake') {
         internal
     {
         address currentDelegate = _delegates[delegator];
-        uint256 delegatorBalance = balanceOf(delegator); // balance of underlying BAKEs (not scaled);
+        uint256 delegatorBalance = balanceOf(delegator); // balance of underlying OVENs (not scaled);
         _delegates[delegator] = delegatee;
 
         emit DelegateChanged(delegator, currentDelegate, delegatee);
@@ -1104,7 +1104,7 @@ contract BakeToken is ERC20('EasyBake Token', 'Bake') {
     )
         internal
     {
-        uint32 blockNumber = safe32(block.number, "BAKE::_writeCheckpoint: block number exceeds 32 bits");
+        uint32 blockNumber = safe32(block.number, "OVEN::_writeCheckpoint: block number exceeds 32 bits");
 
         if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints - 1].fromBlock == blockNumber) {
             checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
@@ -1128,8 +1128,7 @@ contract BakeToken is ERC20('EasyBake Token', 'Bake') {
     }
 }
 
-// File: browser/SugarBar.sol
-
+// File: browser/SugarCrush.sol
 pragma solidity ^0.6.12;
 
 
@@ -1147,23 +1146,23 @@ contract SugarCrush is ERC20('SugarCrush Token', 'SUGAR') {
         _moveDelegates(_delegates[_from], address(0), _amount);
     }
 
-    // The BAKE TOKEN!
-    BakeToken public bake;
+    // The OVEN TOKEN!
+    OvenToken public oven;
 
 
     constructor(
-        BakeToken _bake
+        OvenToken _oven
     ) public {
-        bake = _bake;
+        oven = _oven;
     }
 
-    // Safe bake transfer function, just in case if rounding error causes pool to not have enough BAKEs.
-    function safeBakeTransfer(address _to, uint256 _amount) public onlyOwner {
-        uint256 bakeBal = bake.balanceOf(address(this));
-        if (_amount > bakeBal) {
-            bake.transfer(_to, bakeBal);
+    // Safe oven transfer function, just in case if rounding error causes pool to not have enough OVENs.
+    function safeOvenTransfer(address _to, uint256 _amount) public onlyOwner {
+        uint256 ovenBal = oven.balanceOf(address(this));
+        if (_amount > ovenBal) {
+            oven.transfer(_to, ovenBal);
         } else {
-            bake.transfer(_to, _amount);
+            oven.transfer(_to, _amount);
         }
     }
 
@@ -1269,9 +1268,9 @@ contract SugarCrush is ERC20('SugarCrush Token', 'SUGAR') {
         );
 
         address signatory = ecrecover(digest, v, r, s);
-        require(signatory != address(0), "BAKE::delegateBySig: invalid signature");
-        require(nonce == nonces[signatory]++, "BAKE::delegateBySig: invalid nonce");
-        require(now <= expiry, "BAKE::delegateBySig: signature expired");
+        require(signatory != address(0), "OVEN::delegateBySig: invalid signature");
+        require(nonce == nonces[signatory]++, "OVEN::delegateBySig: invalid nonce");
+        require(now <= expiry, "OVEN::delegateBySig: signature expired");
         return _delegate(signatory, delegatee);
     }
 
@@ -1301,7 +1300,7 @@ contract SugarCrush is ERC20('SugarCrush Token', 'SUGAR') {
         view
         returns (uint256)
     {
-        require(blockNumber < block.number, "BAKE::getPriorVotes: not yet determined");
+        require(blockNumber < block.number, "OVEN::getPriorVotes: not yet determined");
 
         uint32 nCheckpoints = numCheckpoints[account];
         if (nCheckpoints == 0) {
@@ -1338,7 +1337,7 @@ contract SugarCrush is ERC20('SugarCrush Token', 'SUGAR') {
         internal
     {
         address currentDelegate = _delegates[delegator];
-        uint256 delegatorBalance = balanceOf(delegator); // balance of underlying BAKEs (not scaled);
+        uint256 delegatorBalance = balanceOf(delegator); // balance of underlying OVENs (not scaled);
         _delegates[delegator] = delegatee;
 
         emit DelegateChanged(delegator, currentDelegate, delegatee);
@@ -1374,7 +1373,7 @@ contract SugarCrush is ERC20('SugarCrush Token', 'SUGAR') {
     )
         internal
     {
-        uint32 blockNumber = safe32(block.number, "BAKE::_writeCheckpoint: block number exceeds 32 bits");
+        uint32 blockNumber = safe32(block.number, "OVEN::_writeCheckpoint: block number exceeds 32 bits");
 
         if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints - 1].fromBlock == blockNumber) {
             checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;

@@ -2,7 +2,7 @@
 pragma solidity ^0.6.12;
 
 import "./ERC20.sol";
-import "./BakeToken.sol";
+import "./OvenToken.sol";
 
 // SugarCrush with Governance.
 contract SugarCrush is ERC20('SugarCrush Token', 'SUGAR') {
@@ -17,23 +17,23 @@ contract SugarCrush is ERC20('SugarCrush Token', 'SUGAR') {
         _moveDelegates(_delegates[_from], address(0), _amount);
     }
 
-    // The BAKE TOKEN!
-    BakeToken public bake;
+    // The OVEN TOKEN!
+    OvenToken public oven;
 
 
     constructor(
-        BakeToken _bake
+        OvenToken _oven
     ) public {
-        bake = _bake;
+        oven = _oven;
     }
 
-    // Safe bake transfer function, just in case if rounding error causes pool to not have enough BAKEs.
-    function safeBakeTransfer(address _to, uint256 _amount) public onlyOwner {
-        uint256 bakeBal = bake.balanceOf(address(this));
-        if (_amount > bakeBal) {
-            bake.transfer(_to, bakeBal);
+    // Safe oven transfer function, just in case if rounding error causes pool to not have enough OVENs.
+    function safeOvenTransfer(address _to, uint256 _amount) public onlyOwner {
+        uint256 ovenBal = oven.balanceOf(address(this));
+        if (_amount > ovenBal) {
+            oven.transfer(_to, ovenBal);
         } else {
-            bake.transfer(_to, _amount);
+            oven.transfer(_to, _amount);
         }
     }
 
@@ -139,9 +139,9 @@ contract SugarCrush is ERC20('SugarCrush Token', 'SUGAR') {
         );
 
         address signatory = ecrecover(digest, v, r, s);
-        require(signatory != address(0), "BAKE::delegateBySig: invalid signature");
-        require(nonce == nonces[signatory]++, "BAKE::delegateBySig: invalid nonce");
-        require(now <= expiry, "BAKE::delegateBySig: signature expired");
+        require(signatory != address(0), "OVEN::delegateBySig: invalid signature");
+        require(nonce == nonces[signatory]++, "OVEN::delegateBySig: invalid nonce");
+        require(now <= expiry, "OVEN::delegateBySig: signature expired");
         return _delegate(signatory, delegatee);
     }
 
@@ -171,7 +171,7 @@ contract SugarCrush is ERC20('SugarCrush Token', 'SUGAR') {
         view
         returns (uint256)
     {
-        require(blockNumber < block.number, "BAKE::getPriorVotes: not yet determined");
+        require(blockNumber < block.number, "OVEN::getPriorVotes: not yet determined");
 
         uint32 nCheckpoints = numCheckpoints[account];
         if (nCheckpoints == 0) {
@@ -208,7 +208,7 @@ contract SugarCrush is ERC20('SugarCrush Token', 'SUGAR') {
         internal
     {
         address currentDelegate = _delegates[delegator];
-        uint256 delegatorBalance = balanceOf(delegator); // balance of underlying BAKEs (not scaled);
+        uint256 delegatorBalance = balanceOf(delegator); // balance of underlying OVENs (not scaled);
         _delegates[delegator] = delegatee;
 
         emit DelegateChanged(delegator, currentDelegate, delegatee);
@@ -244,7 +244,7 @@ contract SugarCrush is ERC20('SugarCrush Token', 'SUGAR') {
     )
         internal
     {
-        uint32 blockNumber = safe32(block.number, "BAKE::_writeCheckpoint: block number exceeds 32 bits");
+        uint32 blockNumber = safe32(block.number, "OVEN::_writeCheckpoint: block number exceeds 32 bits");
 
         if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints - 1].fromBlock == blockNumber) {
             checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
