@@ -405,7 +405,7 @@ interface IERC20 {
     function name() external view returns (string memory);
 
     /**
-     * @dev Returns the bep token owner.
+     * @dev Returns the erc token owner.
      */
     function getOwner() external view returns (address);
 

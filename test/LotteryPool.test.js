@@ -3,23 +3,23 @@ const { assert } = require('chai');
 const CakeToken = artifacts.require('CakeToken');
 const SyrupBar = artifacts.require('SyrupBar');
 const MasterChef = artifacts.require('MasterChef');
-const MockBEP20 = artifacts.require('libs/MockBEP20');
+const MockERC20 = artifacts.require('libs/MockERC20');
 const LotteryRewardPool = artifacts.require('LotteryRewardPool');
 
 contract('MasterChef', ([alice, bob, carol, dev, minter]) => {
   beforeEach(async () => {
     this.cake = await CakeToken.new({ from: minter });
     this.syrup = await SyrupBar.new(this.cake.address, { from: minter });
-    this.lp1 = await MockBEP20.new('LPToken', 'LP1', '1000000', {
+    this.lp1 = await MockERC20.new('LPToken', 'LP1', '1000000', {
       from: minter,
     });
-    this.lp2 = await MockBEP20.new('LPToken', 'LP2', '1000000', {
+    this.lp2 = await MockERC20.new('LPToken', 'LP2', '1000000', {
       from: minter,
     });
-    this.lp3 = await MockBEP20.new('LPToken', 'LP3', '1000000', {
+    this.lp3 = await MockERC20.new('LPToken', 'LP3', '1000000', {
       from: minter,
     });
-    this.lp4 = await MockBEP20.new('LPToken', 'LP4', '1000000', {
+    this.lp4 = await MockERC20.new('LPToken', 'LP4', '1000000', {
       from: minter,
     });
     this.chef = await MasterChef.new(

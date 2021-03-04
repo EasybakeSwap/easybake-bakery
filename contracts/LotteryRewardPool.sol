@@ -1,23 +1,23 @@
 pragma solidity 0.6.12;
 
-import '@pancakeswap/pancake-swap-lib/contracts/token/BEP20/IBEP20.sol';
-import '@pancakeswap/pancake-swap-lib/contracts/token/BEP20/SafeBEP20.sol';
+import '@pancakeswap/pancake-swap-lib/contracts/token/ERC20/IERC20.sol';
+import '@pancakeswap/pancake-swap-lib/contracts/token/ERC20/SafeERC20.sol';
 import '@pancakeswap/pancake-swap-lib/contracts/access/Ownable.sol';
 
 import './MasterChef.sol';
 
 contract LotteryRewardPool is Ownable {
-    using SafeBEP20 for IBEP20;
+    using SafeERC20 for IERC20;
 
     MasterChef public chef;
     address public adminAddress;
     address public receiver;
-    IBEP20 public lptoken;
-    IBEP20 public cake;
+    IERC20 public lptoken;
+    IERC20 public cake;
 
     constructor(
         MasterChef _chef,
-        IBEP20 _cake,
+        IERC20 _cake,
         address _admin,
         address _receiver
     ) public {
@@ -36,7 +36,7 @@ contract LotteryRewardPool is Ownable {
         _;
     }
 
-    function startFarming(uint256 _pid, IBEP20 _lptoken, uint256 _amount) external onlyAdmin {
+    function startFarming(uint256 _pid, IERC20 _lptoken, uint256 _amount) external onlyAdmin {
         _lptoken.safeApprove(address(chef), _amount);
         chef.deposit(_pid, _amount);
         emit StartFarming(msg.sender, _pid);
@@ -58,7 +58,7 @@ contract LotteryRewardPool is Ownable {
     }
 
     // EMERGENCY ONLY.
-    function emergencyWithdraw(IBEP20 _token, uint256 _amount) external onlyOwner {
+    function emergencyWithdraw(IERC20 _token, uint256 _amount) external onlyOwner {
         cake.safeTransfer(address(msg.sender), _amount);
         emit EmergencyWithdraw(msg.sender, _amount);
     }
