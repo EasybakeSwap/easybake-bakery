@@ -848,7 +848,7 @@ abstract contract Ownable is Context {
 }
 
 //
-// ChefEco is the treasurer of OVEN. She may allocate OVEN and she is a fair lady <3
+// Chef Buns is the mother of OVEN. She may allocate OVEN and she is a fair lady <3
 // Note that it's ownable and the owner wields tremendous power. The ownership
 // will be transferred to a governance smart contract once OVEN is sufficiently
 // distributed and the community can show to govern itself.
