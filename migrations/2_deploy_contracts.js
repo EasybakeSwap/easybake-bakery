@@ -1,4 +1,4 @@
-const factory = require('EasyBakeFactory.sol');
+const factory = artifacts.require('EasyBakeFactory.sol');
 const router = artifacts.require('EasyBakeRouter.sol');
 const WETH = artifacts.require('WETH.sol');
 const MockERC20 = artifacts.require('MockERC20.sol');

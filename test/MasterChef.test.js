@@ -59,9 +59,9 @@ contract('MasterChef', ([alice, bob, carol, admin, treasury, minter]) => {
 
 
     it('deposit/withdraw', async () => {
-      await this.chef.add('1000', this.lp1.address, true, { from: minter });
-      await this.chef.add('1000', this.lp2.address, true, { from: minter });
-      await this.chef.add('1000', this.lp3.address, true, { from: minter });
+      await this.chef.add('1000', this.lp1.address, '0', true, { from: minter });
+      await this.chef.add('1000', this.lp2.address, '0', true, { from: minter });
+      await this.chef.add('1000', this.lp3.address, '0', true, { from: minter });
 
       await this.lp1.approve(this.chef.address, '100', { from: alice });
       await this.chef.deposit(1, '20', { from: alice });
@@ -72,8 +72,8 @@ contract('MasterChef', ([alice, bob, carol, admin, treasury, minter]) => {
       await this.chef.withdraw(1, '10', { from: alice });
       assert.equal((await this.lp1.balanceOf(alice)).toString(), '1950');
       assert.equal((await this.oven.balanceOf(alice)).toString(), '999');
-      assert.equal((await this.oven.balanceOf(admin)).toString(), '100');
-      assert.equal((await this.oven.balanceOf(treasury)).toString(), '0');
+      assert.equal((await this.oven.balanceOf(admin)).toString(), '112');
+      assert.equal((await this.oven.balanceOf(treasury)).toString(), '112');
 
       await this.lp1.approve(this.chef.address, '100', { from: bob });
       assert.equal((await this.lp1.balanceOf(bob)).toString(), '2000');
@@ -81,14 +81,12 @@ contract('MasterChef', ([alice, bob, carol, admin, treasury, minter]) => {
       assert.equal((await this.lp1.balanceOf(bob)).toString(), '1950');
       await this.chef.deposit(1, '0', { from: bob });
       assert.equal((await this.oven.balanceOf(bob)).toString(), '125');
-      await this.chef.emergencyWithdraw(1, { from: bob });
-      assert.equal((await this.lp1.balanceOf(bob)).toString(), '2000');
     })
 
     it('staking/unstaking', async () => {
-      await this.chef.add('1000', this.lp1.address, true, { from: minter });
-      await this.chef.add('1000', this.lp2.address, true, { from: minter });
-      await this.chef.add('1000', this.lp3.address, true, { from: minter });
+      await this.chef.add('1000', this.lp1.address, '0', true, { from: minter });
+      await this.chef.add('1000', this.lp2.address, '0', true, { from: minter });
+      await this.chef.add('1000', this.lp3.address, '0', true, { from: minter });
 
       await this.lp1.approve(this.chef.address, '10', { from: alice });
       await this.chef.deposit(1, '2', { from: alice }); //0
@@ -109,9 +107,9 @@ contract('MasterChef', ([alice, bob, carol, admin, treasury, minter]) => {
 
 
     it('update multiplier', async () => {
-      await this.chef.add('1000', this.lp1.address, true, { from: minter });
-      await this.chef.add('1000', this.lp2.address, true, { from: minter });
-      await this.chef.add('1000', this.lp3.address, true, { from: minter });
+      await this.chef.add('1000', this.lp1.address, '0', true, { from: minter });
+      await this.chef.add('1000', this.lp2.address, '0', true, { from: minter });
+      await this.chef.add('1000', this.lp3.address, '0', true, { from: minter });
 
       await this.lp1.approve(this.chef.address, '100', { from: alice });
       await this.lp1.approve(this.chef.address, '100', { from: bob });
