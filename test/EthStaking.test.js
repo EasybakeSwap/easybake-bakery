@@ -1,13 +1,13 @@
 const { expectRevert, time } = require('@openzeppelin/test-helpers');
 const { assert } = require('chai');
-const CakeToken = artifacts.require('CakeToken');
+const OvenToken = artifacts.require('OvenToken');
 const EthStaking = artifacts.require('EthStaking');
 const MockERC20 = artifacts.require('libs/MockERC20');
 const WETH = artifacts.require('libs/WETH');
 
 contract('EthStaking.......', async ([alice, bob, admin, dev, minter]) => {
   beforeEach(async () => {
-    this.rewardToken = await CakeToken.new({ from: minter });
+    this.rewardToken = await OvenToken.new({ from: minter });
     this.lpToken = await MockERC20.new('LPToken', 'LP1', '1000000', {
       from: minter,
     });

@@ -1,14 +1,42 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.12;
 
-import './ERC20.sol';
+pragma solidity >=0.6.12;
 
-// Oven Token with Governance.
-contract OvenToken is ERC20('EasybakeOven Token', 'OVEN') {
-    /// @notice Creates `_amount` token to `_to`. Must only be called by the owner (MasterChef).
+import "easybake-swap-lib/contracts/token/ERC20/ERC20.sol";
+
+import "./OvenToken.sol";
+
+// SugarBar with Governance.
+contract SugarBar is ERC20('SugarBar Token', 'SUGAR') {
+    /// @dev Creates `_amount` token to `_to`. Must only be called by the owner (MasterChef).
     function mint(address _to, uint256 _amount) public onlyOwner {
         _mint(_to, _amount);
         _moveDelegates(address(0), _delegates[_to], _amount);
+    }
+
+    function burn(address _from ,uint256 _amount) public onlyOwner {
+        _burn(_from, _amount);
+        _moveDelegates(_delegates[_from], address(0), _amount);
+    }
+
+    // The OVEN TOKEN!
+    OvenToken public oven;
+
+
+    constructor(
+        OvenToken _oven
+    ) public {
+        oven = _oven;
+    }
+
+    // Safe oven transfer function, just in case if rounding error causes pool to not have enough OVEN.
+    function safeOvenTransfer(address _to, uint256 _amount) public onlyOwner {
+        uint256 ovenBal = oven.balanceOf(address(this));
+        if (_amount > ovenBal) {
+            oven.transfer(_to, ovenBal);
+        } else {
+            oven.transfer(_to, _amount);
+        }
     }
 
     // Copied and modified from YAM code:
@@ -17,37 +45,38 @@ contract OvenToken is ERC20('EasybakeOven Token', 'OVEN') {
     // Which is copied and modified from COMPOUND:
     // https://github.com/compound-finance/compound-protocol/blob/master/contracts/Governance/Comp.sol
 
+    /// @dev A record of each accounts delegate
     mapping (address => address) internal _delegates;
 
-    /// @notice A checkpoint for marking number of votes from a given block
+    /// @dev A checkpoint for marking number of votes from a given block
     struct Checkpoint {
         uint32 fromBlock;
         uint256 votes;
     }
 
-    /// @notice A record of votes checkpoints for each account, by index
+    /// @dev A record of votes checkpoints for each account, by index
     mapping (address => mapping (uint32 => Checkpoint)) public checkpoints;
 
-    /// @notice The number of checkpoints for each account
+    /// @dev The number of checkpoints for each account
     mapping (address => uint32) public numCheckpoints;
 
-    /// @notice The EIP-712 typehash for the contract's domain
+    /// @dev The EIP-712 typehash for the contract's domain
     bytes32 public constant DOMAIN_TYPEHASH = keccak256("EIP712Domain(string name,uint256 chainId,address verifyingContract)");
 
-    /// @notice The EIP-712 typehash for the delegation struct used by the contract
+    /// @dev The EIP-712 typehash for the delegation struct used by the contract
     bytes32 public constant DELEGATION_TYPEHASH = keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
 
-    /// @notice A record of states for signing / validating signatures
+    /// @dev A record of states for signing / validating signatures
     mapping (address => uint) public nonces;
 
-      /// @notice An event thats emitted when an account changes its delegate
+      /// @dev An event thats emitted when an account changes its delegate
     event DelegateChanged(address indexed delegator, address indexed fromDelegate, address indexed toDelegate);
 
-    /// @notice An event thats emitted when a delegate account's vote balance changes
+    /// @dev An event thats emitted when a delegate account's vote balance changes
     event DelegateVotesChanged(address indexed delegate, uint previousBalance, uint newBalance);
 
     /**
-     * @notice Delegate votes from `msg.sender` to `delegatee`
+     * @dev Delegate votes from `msg.sender` to `delegatee`
      * @param delegator The address to get delegatee for
      */
     function delegates(address delegator)
@@ -59,7 +88,7 @@ contract OvenToken is ERC20('EasybakeOven Token', 'OVEN') {
     }
 
    /**
-    * @notice Delegate votes from `msg.sender` to `delegatee`
+    * @dev Delegate votes from `msg.sender` to `delegatee`
     * @param delegatee The address to delegate votes to
     */
     function delegate(address delegatee) external {
@@ -67,7 +96,7 @@ contract OvenToken is ERC20('EasybakeOven Token', 'OVEN') {
     }
 
     /**
-     * @notice Delegates votes from signatory to `delegatee`
+     * @dev Delegates votes from signatory to `delegatee`
      * @param delegatee The address to delegate votes to
      * @param nonce The contract state required to match the signature
      * @param expiry The time at which to expire the signature
@@ -114,12 +143,12 @@ contract OvenToken is ERC20('EasybakeOven Token', 'OVEN') {
         address signatory = ecrecover(digest, v, r, s);
         require(signatory != address(0), "OVEN::delegateBySig: invalid signature");
         require(nonce == nonces[signatory]++, "OVEN::delegateBySig: invalid nonce");
-        require(block.timestamp <= expiry, "OVEN::delegateBySig: signature expired");
+        require(now <= expiry, "OVEN::delegateBySig: signature expired");
         return _delegate(signatory, delegatee);
     }
 
     /**
-     * @notice Gets the current votes balance for `account`
+     * @dev Gets the current votes balance for `account`
      * @param account The address to get votes balance
      * @return The number of current votes for `account`
      */
@@ -133,7 +162,7 @@ contract OvenToken is ERC20('EasybakeOven Token', 'OVEN') {
     }
 
     /**
-     * @notice Determine the prior number of votes for an account as of a block number
+     * @dev Determine the prior number of votes for an account as of a block number
      * @dev Block number must be a finalized block or else this function will revert to prevent misinformation.
      * @param account The address of the account to check
      * @param blockNumber The block number to get the vote balance at
@@ -181,7 +210,7 @@ contract OvenToken is ERC20('EasybakeOven Token', 'OVEN') {
         internal
     {
         address currentDelegate = _delegates[delegator];
-        uint256 delegatorBalance = balanceOf(delegator); // balance of underlying OVENs (not scaled);
+        uint256 delegatorBalance = balanceOf(delegator); // balance of underlying OVEN (not scaled);
         _delegates[delegator] = delegatee;
 
         emit DelegateChanged(delegator, currentDelegate, delegatee);

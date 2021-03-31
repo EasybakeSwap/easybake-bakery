@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity 0.6.12;
 
-import '/easybake-swap-lib/contracts/math/SafeMath.sol';
-import '/easybake-swap-lib/contracts/token/ERC20/IERC20.sol';
-import '/easybake-swap-lib/contracts/token/ERC20/SafeERC20.sol';
-import '/easybake-swap-lib/contracts/access/Ownable.sol';
+import 'easybake-swap-lib/contracts/math/SafeMath.sol';
+import 'easybake-swap-lib/contracts/token/ERC20/IERC20.sol';
+import 'easybake-swap-lib/contracts/token/ERC20/SafeERC20.sol';
+import 'easybake-swap-lib/contracts/access/Ownable.sol';
 
 // import "@nomiclabs/buidler/console.sol";
 

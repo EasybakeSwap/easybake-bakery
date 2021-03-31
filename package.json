@@ -1,18 +1,26 @@
 {
-  "name": "EasybakeSwap",
+  "name": "easybake-bakery",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "migrate": "truffle migrate --network bscTestnet --reset",
-    "compile": "truffle compile --network bscTestnet",
-    "test": "npx builder test",
-    "coverage": "npx builder coverage"
+    "migrate": "truffle migrate --reset",
+    "migrate:rinkeby": "truffle migrate --network rinkeby --reset",
+    "compile": "truffle compile",
+    "compile:rinkeby": "truffle compile --network rinkeby",
+    "test": "npx buidler test",
+    "coverage": "npx buidler coverage"
   },
   "dependencies": {
     "@openzeppelin/test-helpers": "^0.5.6",
-    "contracts": "file:../easybake-swap-lib",
+    "babel-polyfill": "^6.26.0",
+    "babel-register": "^6.26.0",
+    "dotenv": "^8.2.0",
+    "easybake-swap-core": "^0.2.0",
+    "easybake-swap-lib": "^0.1.0",
+    "easybake-swap-periphery": "^1.0.1",
     "truffle": "^5.1.58",
-    "truffle-flattener": "^1.4.4"
+    "truffle-flattener": "^1.4.4",
+    "truffle-hdwallet-provider-privkey": "^0.3.0"
   },
   "devDependencies": {
     "@nomiclabs/buidler": "^1.4.7",

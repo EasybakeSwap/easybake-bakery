@@ -1,14 +1,15 @@
-/// SPDX-License-Identifier: MIT
-pragma solidity 0.6.12;
+// SPDX-License-Identifier: MIT
 
-import '@pancakeswap/pancake-swap-lib/contracts/math/SafeMath.sol';
-import '@pancakeswap/pancake-swap-lib/contracts/token/ERC20/IERC20.sol';
-import '@pancakeswap/pancake-swap-lib/contracts/token/ERC20/SafeERC20.sol';
+pragma solidity >=0.5.16;
+
+import 'easybake-swap-lib/contracts/math/SafeMath.sol';
+import 'easybake-swap-lib/contracts/token/ERC20/IERC20.sol';
+import 'easybake-swap-lib/contracts/token/ERC20/SafeERC20.sol';
 
 // import "@nomiclabs/buidler/console.sol";
 
-// SugarMama is the chef of new tokens. She can make yummy food and she is a fair lady as well as MasterChef.
-contract SugarMama {
+// EasyChef is the chef of new tokens. She can make yummy food and she is a fair lady as well as MasterChef.
+contract EasyChef {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -18,14 +19,14 @@ contract SugarMama {
         uint256 rewardDebt;  // Reward debt. See explanation below.
         uint256 rewardPending;
         //
-        // We do some fancy math here. Basically, any point in time, the amount of SUGARs
+        // We do some fancy math here. Basically, any point in time, the amount of SUGAR
         // entitled to a user but is pending to be distributed is:
         //
         //   pending reward = (user.amount * pool.accRewardPerShare) - user.rewardDebt + user.rewardPending
         //
         // Whenever a user deposits or withdraws SUGAR tokens to a pool. Here's what happens:
         //   1. The pool's `accRewardPerShare` (and `lastRewardBlock`) gets updated.
-        //   2. User receives the pending reward sent to their address.
+        //   2. User receives the pending reward sent to his/her address.
         //   3. User's `amount` gets updated.
         //   3. User's `amount` gets updated.
         //   4. User's `rewardDebt` gets updated.
@@ -124,7 +125,7 @@ contract SugarMama {
     }
 
 
-    // Deposit Sugar tokens to SugarMama for Reward allocation.
+    // Deposit Sugar tokens to EasyChef for Reward allocation.
     function deposit(uint256 _amount) public {
         require (_amount > 0, 'amount 0');
         UserInfo storage user = userInfo[msg.sender];
@@ -141,7 +142,7 @@ contract SugarMama {
         emit Deposit(msg.sender, _amount);
     }
 
-    // Withdraw Sugar tokens from SugarMama.
+    // Withdraw Sugar tokens from EasyChef.
     function withdraw(uint256 _amount) public {
         require (_amount > 0, 'amount 0');
         UserInfo storage user = userInfo[msg.sender];

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity 0.6.12;
 
 interface IERC20 {
@@ -98,7 +100,7 @@ interface IERC20 {
 
 contract EasyBakeVoterProxy {
     // SUGAR
-    address public constant votes = 0x744342261860f01826922ea973ecfecd727a25e0;
+    address public votes; // constant votes = 0x744342261860f01826922ea973ecfecd727a25e0;
 
     function decimals() external pure returns (uint8) {
         return uint8(18);
