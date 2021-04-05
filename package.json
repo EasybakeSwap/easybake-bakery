@@ -4,9 +4,13 @@
   "main": "index.js",
   "scripts": {
     "migrate": "truffle migrate --reset",
-    "migrate:rinkeby": "truffle migrate --network rinkeby --reset",
+    "migrate:rinkeby": "truffle migrate --reset --network rinkeby",
     "compile": "truffle compile",
     "compile:rinkeby": "truffle compile --network rinkeby",
+    "verify:oven": "truffle run verify OvenToken --network rinkeby --license SPDX-License-Identifier",
+    "verify:sugar": "truffle run verify SugarBar --network rinkeby --license SPDX-License-Identifier",
+    "verify:master": "truffle run verify MasterChef --network rinkeby --license SPDX-License-Identifier",
+    "flatten:oven": "./node_modules/.bin/truffle-flattener contracts/OvenToken.sol > flats/OvenToken_flat.sol",
     "test": "npx buidler test",
     "coverage": "npx buidler coverage"
   },
@@ -18,8 +22,8 @@
     "easybake-swap-core": "^0.2.0",
     "easybake-swap-lib": "^0.1.0",
     "easybake-swap-periphery": "^1.0.1",
-    "truffle": "^5.1.58",
-    "truffle-flattener": "^1.4.4",
+    "truffle": "^5.3.0",
+    "truffle-flattener": "^1.5.0",
     "truffle-hdwallet-provider-privkey": "^0.3.0"
   },
   "devDependencies": {

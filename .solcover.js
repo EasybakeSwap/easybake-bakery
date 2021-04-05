@@ -8,7 +8,6 @@ module.exports = {
     "libs",
     "libs",
     "SugarBar.sol",
-    "OvenToken.sol",
     "Timelock.sol"
   ],
   measureStatementCoverage: false,
