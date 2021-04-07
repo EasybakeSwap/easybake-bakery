@@ -12,7 +12,10 @@
     "verify:master": "truffle run verify MasterChef --network rinkeby --license SPDX-License-Identifier",
     "flatten:oven": "./node_modules/.bin/truffle-flattener contracts/OvenToken.sol > flats/OvenToken_flat.sol",
     "test": "npx buidler test",
-    "coverage": "npx buidler coverage"
+    "coverage": "npx buidler coverage",
+    "flatten:oven": "truffle-flattener ./contracts/OvenToken.sol > ./flats/OvenToken.sol",
+    "flatten:bar": "truffle-flattener ./contracts/SugarBar.sol > ./flats/SugarBar_flat.sol",
+    "flatten:chef": "truffle-flattener ./contracts/MasterChef.sol > ./flats/SugarBar_flat.sol"
   },
   "dependencies": {
     "@openzeppelin/test-helpers": "^0.5.6",
