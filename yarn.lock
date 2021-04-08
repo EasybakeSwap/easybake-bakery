@@ -5901,10 +5901,10 @@ easybake-swap-core@^0.2.0:
     truffle-hdwallet-provider "^1.0.17"
     truffle-verify "^1.0.8"
 
-easybake-swap-lib@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/easybake-swap-lib/-/easybake-swap-lib-0.1.0.tgz#743b17353902dde7f5b009ccbc636cb9a7b7588b"
-  integrity sha512-v4UuV423yNnX7WB4YiqUQPF4xFE6WDl11IN/bRr0fY1DgQz6yY/6D16oD6Ri5QCMWKT3TXFRMWcA1zKhGNyDFg==
+easybake-swap-lib@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/easybake-swap-lib/-/easybake-swap-lib-0.2.0.tgz#47faafa92575f841bec6e838c7b3c5cccd40ab62"
+  integrity sha512-BPis7plGwu7uDkx51ZjVKkANSXOU5sAsdu1WaAB0sHD+3jBgosGH3Rg05xp1volW23f9R6wCDggbFNy8O5q6xg==
 
 easybake-swap-periphery@^1.0.1:
   version "1.0.1"

@@ -451,9 +451,7 @@ library Address {
 
 // File: easybake-swap-lib/contracts/token/ERC20/SafeERC20.sol
 
-
 pragma solidity ^0.6.0;
-
 
 /**
  * @title SafeERC20
@@ -1213,7 +1211,7 @@ contract OvenToken is ERC20('Oven Token', 'Oven') {
 
 // File: contracts/SugarBar.sol
 
-pragma solidity >=0.6.12;
+pragma solidity 0.6.12;
 
 // SugarBar with Governance.
 contract SugarBar is ERC20('SugarBar Token', 'SUGAR') {
@@ -1481,8 +1479,7 @@ contract SugarBar is ERC20('SugarBar Token', 'SUGAR') {
 
 // File: contracts/MasterChef.sol
 
-
-pragma solidity >=0.6.12;
+pragma solidity 0.6.12;
 
 // import "@nomiclabs/buidler/console.sol";
 
@@ -1492,7 +1489,7 @@ interface IMigratorChef {
     // Migrator should have full access to the caller's LP token.
     // Return the new LP token address.
     //
-    // XXX Migrator must have allowance access to OvenSwap LP tokens.
+    // XXX Migrator mus` have allowance access to OvenSwap LP tokens.
     // OvenSwap must mint EXACTLY the same amount of Oven LP tokens or
     // else something bad will happen. Traditional OvenSwap does not
     // do that so be careful!
@@ -1530,7 +1527,6 @@ contract MasterChef is Ownable {
     struct PoolInfo {
         IERC20 lpToken;           // Address of LP token contract.
         uint256 allocPoint;       // How many allocation points assigned to this pool. OVENs to distribute per block.
-        uint256 taxRate;          // Rate at which the LP token deposit is taxed.
         uint256 lastRewardBlock;  // Last block number that OVENs distribution occurs.
         uint256 accOvenPerShare; // Accumulated OVENs per share, times 1e12. See below.
     }
@@ -1591,7 +1587,6 @@ contract MasterChef is Ownable {
         poolInfo.push(PoolInfo({
             lpToken: _oven,
             allocPoint: 1000,
-            taxRate: 0,
             lastRewardBlock: startBlock,
             accOvenPerShare: 0
         }));
@@ -1617,7 +1612,7 @@ contract MasterChef is Ownable {
     }
 
     // ADD -- NEW LP TOKEN POOL -- OWNER
-    function add(uint256 _allocPoint, IERC20 _lpToken, uint256 _taxRate, bool _withUpdate) public onlyOwner {
+    function add(uint256 _allocPoint, IERC20 _lpToken, bool _withUpdate) public onlyOwner {
         if (_withUpdate) {
             massUpdatePools();
         }
@@ -1626,7 +1621,6 @@ contract MasterChef is Ownable {
         poolInfo.push(PoolInfo({
             lpToken: _lpToken,
             allocPoint: _allocPoint,
-            taxRate: _taxRate,
             lastRewardBlock: lastRewardBlock,
             accOvenPerShare: 0
         }));
@@ -1739,8 +1733,6 @@ contract MasterChef is Ownable {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
         updatePool(_pid);
-        uint256 taxedAmount = pool.taxRate == 0 ? 0 : _amount.div(pool.taxRate); // fix: division by 0 error
-
         if (user.amount > 0) { // already deposited assets
             uint256 pending = user.amount.mul(pool.accOvenPerShare).div(1e12).sub(user.rewardDebt);
             if(pending > 0) { // sends pending rewards, if applicable
@@ -1749,13 +1741,11 @@ contract MasterChef is Ownable {
         }
 
         if (_amount > 0) { // if adding more
-            pool.lpToken.safeTransferFrom(address(msg.sender), address(this), _amount.sub(taxedAmount));
-            pool.lpToken.safeTransferFrom(address(msg.sender), address(treasury), taxedAmount);
-
-            user.amount = user.amount.add(_amount.sub(taxedAmount)); // new user.amount == untaxed amount
+            pool.lpToken.safeTransferFrom(address(msg.sender), address(this), _amount);
+            user.amount = user.amount.add(_amount);
         }
         user.rewardDebt = user.amount.mul(pool.accOvenPerShare).div(1e12);
-        emit Deposit(msg.sender, _pid, _amount.sub(taxedAmount));
+        emit Deposit(msg.sender, _pid, _amount);
     }
 
     // WITHDRAW -- LP TOKENS -- STAKERS
