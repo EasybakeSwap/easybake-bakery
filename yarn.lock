@@ -2662,16 +2662,6 @@
   resolved "https://registry.yarnpkg.com/@types/zen-observable/-/zen-observable-0.8.2.tgz#808c9fa7e4517274ed555fa158f2de4b4f468e71"
   integrity sha512-HrCIVMLjE1MOozVoD86622S7aunluLb2PJdPfb3nYiEtohm8mIB/vyv0Fd37AdeMFrTUQXEunw78YloMA3Qilg==
 
-"@uniswap/lib@1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@uniswap/lib/-/lib-1.1.1.tgz#0afd29601846c16e5d082866cbb24a9e0758e6bc"
-  integrity sha512-2yK7sLpKIT91TiS5sewHtOa7YuM8IuBXVl4GZv2jZFys4D2sY7K5vZh6MqD25TPA95Od+0YzCVq6cTF2IKrOmg==
-
-"@uniswap/v2-core@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@uniswap/v2-core/-/v2-core-1.0.1.tgz#af8f508bf183204779938969e2e54043e147d425"
-  integrity sha512-MtybtkUPSyysqLY2U210NBDeCHX+ltHt3oADGdjqoThZaFRDKwM6k1Nb3F0A3hk5hwuQvytFWhrWHOEq6nVJ8Q==
-
 "@wry/context@^0.6.0":
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/@wry/context/-/context-0.6.0.tgz#f903eceb89d238ef7e8168ed30f4511f92d83e06"
@@ -5891,10 +5881,10 @@ duplexify@^3.2.0:
     readable-stream "^2.0.0"
     stream-shift "^1.0.0"
 
-easybake-swap-core@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/easybake-swap-core/-/easybake-swap-core-0.2.0.tgz#f7197ba20a9381a9ca705d31e39874350b4ec5a0"
-  integrity sha512-LQWR9wmP06bbmm8XogK/IxGsLWETrfjv9scn71FnaglLH4Nucf0+2hwFUgfw5JdJcn49h8fF6hlbzoacCQcxwA==
+easybake-swap-core@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/easybake-swap-core/-/easybake-swap-core-0.2.1.tgz#f46303b9178a4c90a43e4057a12a974485e137b5"
+  integrity sha512-cm20++1fpWx0EgMIeiRgqwhls5PLj8Xad8k4NZQ8+s8XdkIOkBQmSN0B8h+hBv3CWTzjdoef32TTDxZ70g5kwQ==
   dependencies:
     truffle "^5.2.6"
     truffle-flattener "^1.4.4"
@@ -5906,13 +5896,13 @@ easybake-swap-lib@^0.2.0:
   resolved "https://registry.yarnpkg.com/easybake-swap-lib/-/easybake-swap-lib-0.2.0.tgz#47faafa92575f841bec6e838c7b3c5cccd40ab62"
   integrity sha512-BPis7plGwu7uDkx51ZjVKkANSXOU5sAsdu1WaAB0sHD+3jBgosGH3Rg05xp1volW23f9R6wCDggbFNy8O5q6xg==
 
-easybake-swap-periphery@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/easybake-swap-periphery/-/easybake-swap-periphery-1.0.1.tgz#647e82863de021c646bed2098f0a93b6152ceeeb"
-  integrity sha512-asO/SKu5wle+LACouzgHwwF/rP5bNYa6BpNpBOCoIhabQjNW5n8MlqIGqCEe+0CzcWItTCfQiq21vVUK0Orsqw==
+easybake-swap-periphery@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/easybake-swap-periphery/-/easybake-swap-periphery-2.1.0.tgz#7e8ced7b42a4b04ec704b92751e2c72792bb4cf0"
+  integrity sha512-Ohxxv+Un44ZtNLpQCG2I4If/i2EmF1K52n1LhUEA++/nh+mCK+5+VroES6zROYL94kWGwlj8D8KoomtrKXdX/Q==
   dependencies:
-    "@uniswap/lib" "1.1.1"
-    "@uniswap/v2-core" "^1.0.1"
+    easybake-swap-core "^0.2.1"
+    easybake-swap-lib "^0.2.0"
     truffle-flattener "^1.5.0"
     truffle-hdwallet-provider "^1.0.17"
     truffle-plugin-verify "^0.4.0"

@@ -44,14 +44,14 @@ library SafeMath {
 
 
 
-pragma solidity >=0.6.12;
+pragma solidity >=0.6.6;
 
 
 contract EasyBakeERC20 {
     using SafeMath for uint;
 
-    string public constant name = 'DOUGH-LP';
-    string public constant symbol = 'DLP';
+    string public constant name = 'DOUGH LP';
+    string public constant symbol = 'DOUGH-LP';
     uint8 public constant decimals = 18;
     uint  public totalSupply;
     mapping(address => uint) public balanceOf;
@@ -226,13 +226,7 @@ interface IEasyBakeCallee {
 
 
 
-pragma solidity >=0.6.12;
-
-
-
-
-
-
+pragma solidity >=0.6.6;
 
 
 interface IMigrator {
@@ -443,7 +437,7 @@ contract EasyBakePair is EasyBakeERC20 {
 
 
 
-pragma solidity >=0.6.12;
+pragma solidity >=0.6.6;
 
 
 
