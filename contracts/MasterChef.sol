@@ -13,14 +13,14 @@ import "./SugarBar.sol";
 // import "@nomiclabs/buidler/console.sol";
 
 interface IMigratorChef {
-    // Perform LP token migration from legacy OvenSwap.
+    // Perform LP token migration from legacy EasyBakeSwap.
     // Take the current LP token address and return the new LP token address.
     // Migrator should have full access to the caller's LP token.
     // Return the new LP token address.
     //
-    // XXX Migrator mus` have allowance access to OvenSwap LP tokens.
-    // OvenSwap must mint EXACTLY the same amount of Oven LP tokens or
-    // else something bad will happen. Traditional OvenSwap does not
+    // XXX Migrator must have allowance access to DOUGH LP tokens.
+    // EasyBakeSwap must mint EXACTLY the same amount of DOUGH LP tokens or
+    // else something bad will happen. Traditional EasyBakeSwap does not
     // do that so be careful!
     function migrate(IERC20 token) external returns (IERC20);
 }
@@ -60,16 +60,15 @@ contract MasterChef is Ownable {
         uint256 accOvenPerShare; // Accumulated OVENs per share, times 1e12. See below.
     }
 
-
     //** ADDRESSES **//
 
     // The OVEN TOKEN!
     OvenToken public oven;
     // The SUGAR TOKEN!
     SugarBar public sugar;
-    // Admin address, which recieves 1.5 OVEN per block (mutable by admin)
+    // Admin address, which recieves 1.5 OVEN per block
     address public admin;
-    // Treasury address, which recieves 1.5 OVEN per block (mutable by admin and dev)
+    // Treasury address, which recieves 1.5 OVEN per block
     address public treasury;
     // The migrator contract. It has a lot of power. Can only be set through governance (owner).
     IMigratorChef public migrator;
@@ -85,7 +84,6 @@ contract MasterChef is Ownable {
     uint256 public startBlock;
     // Total allocation points. Must be the sum of all allocation points in all pools.
     uint256 public totalAllocPoint = 0;
-    
 
     // ** POOL VARIABLES ** //
 
@@ -226,7 +224,6 @@ contract MasterChef is Ownable {
             updatePool(pid);
         }
     }
-
 
     // UPDATE -- REWARD VARIABLES (POOL) -- PUBLIC
     function updatePool(uint256 _pid) public {

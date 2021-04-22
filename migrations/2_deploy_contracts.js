@@ -6,7 +6,7 @@ const OvenToken = artifacts.require('OvenToken.sol');
 const MasterChef = artifacts.require('MasterChef.sol');
 const SugarBar = artifacts.require('SugarBar.sol');
 
-module.exports = async function(deployer, network, addresses) {
+module.exports = async function(deployer, addresses) {
   
   // Deploy Mock Tokens
     await deployer.deploy(WETH);
