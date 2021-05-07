@@ -1,16 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity ^0.8.0;
 
-import 'easybake-swap-lib/contracts/math/SafeMath.sol';
-import 'easybake-swap-lib/contracts/token/ERC20/IERC20.sol';
-import 'easybake-swap-lib/contracts/token/ERC20/SafeERC20.sol';
-import 'easybake-swap-lib/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 
 import "./OvenToken.sol";
 import "./SugarBar.sol";
-
-// import "@nomiclabs/buidler/console.sol";
 
 interface IMigratorChef {
     // Perform LP token migration from legacy EasyBakeSwap.
@@ -32,8 +28,6 @@ interface IMigratorChef {
 // distributed and the community can show to govern itself.
 
 contract MasterChef is Ownable {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
 
     // Info of each user.
     struct UserInfo {
@@ -66,8 +60,8 @@ contract MasterChef is Ownable {
     OvenToken public oven;
     // The SUGAR TOKEN!
     SugarBar public sugar;
-    // Admin address, which recieves 1.5 OVEN per block
-    address public admin;
+    // Team address, which recieves 1.5 OVEN per block
+    address public team;
     // Treasury address, which recieves 1.5 OVEN per block
     address public treasury;
     // The migrator contract. It has a lot of power. Can only be set through governance (owner).
@@ -98,14 +92,14 @@ contract MasterChef is Ownable {
     constructor(
         OvenToken _oven,
         SugarBar _sugar,
-        address _admin,
+        address _team,
         address _treasury,
         uint256 _ovenPerBlock,
         uint256 _startBlock
-    ) public {
+    ) {
         oven = _oven;
         sugar = _sugar;
-        admin = _admin;
+        team = _team;
         treasury = _treasury;
         ovenPerBlock = _ovenPerBlock;
         startBlock = _startBlock;
@@ -144,7 +138,7 @@ contract MasterChef is Ownable {
             massUpdatePools();
         }
         uint256 lastRewardBlock = block.number > startBlock ? block.number : startBlock;
-        totalAllocPoint = totalAllocPoint.add(_allocPoint);
+        totalAllocPoint = totalAllocPoint + _allocPoint;
         poolInfo.push(PoolInfo({
             lpToken: _lpToken,
             allocPoint: _allocPoint,
@@ -162,7 +156,7 @@ contract MasterChef is Ownable {
         uint256 prevAllocPoint = poolInfo[_pid].allocPoint;
         poolInfo[_pid].allocPoint = _allocPoint;
         if (prevAllocPoint != _allocPoint) {
-            totalAllocPoint = totalAllocPoint.sub(prevAllocPoint).add(_allocPoint);
+            totalAllocPoint = totalAllocPoint - prevAllocPoint + _allocPoint;
             updateStakingPool();
         }
     }
@@ -172,11 +166,11 @@ contract MasterChef is Ownable {
         uint256 length = poolInfo.length;
         uint256 points = 0;
         for (uint256 pid = 1; pid < length; ++pid) {
-            points = points.add(poolInfo[pid].allocPoint);
+            points = points + poolInfo[pid].allocPoint;
         }
         if (points != 0) {
-            points = points.div(3);
-            totalAllocPoint = totalAllocPoint.sub(poolInfo[0].allocPoint).add(points);
+            points = points / 3;
+            totalAllocPoint = totalAllocPoint - poolInfo[0].allocPoint + points;
             poolInfo[0].allocPoint = points;
         }
     }
@@ -192,7 +186,7 @@ contract MasterChef is Ownable {
         PoolInfo storage pool = poolInfo[_pid];
         IERC20 lpToken = pool.lpToken;
         uint256 bal = lpToken.balanceOf(address(this));
-        lpToken.safeApprove(address(migrator), bal);
+        lpToken.approve(address(migrator), bal);
         IERC20 newLpToken = migrator.migrate(lpToken);
         require(bal == newLpToken.balanceOf(address(this)), "migrate: bad");
         pool.lpToken = newLpToken;
@@ -200,7 +194,7 @@ contract MasterChef is Ownable {
 
     // VIEW -- BONUS MULTIPLIER -- PUBLIC
     function getMultiplier(uint256 _from, uint256 _to) public view returns (uint256) {
-        return _to.sub(_from).mul(BONUS_MULTIPLIER);
+        return _to - _from * BONUS_MULTIPLIER;
     }
 
     // VIEW -- PENDING OVEN
@@ -211,10 +205,10 @@ contract MasterChef is Ownable {
         uint256 lpSupply = pool.lpToken.balanceOf(address(this));
         if (block.number > pool.lastRewardBlock && lpSupply != 0) {
             uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
-            uint256 ovenReward = multiplier.mul(ovenPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
-            accOvenPerShare = accOvenPerShare.add(ovenReward.mul(1e12).div(lpSupply));
+            uint256 ovenReward = multiplier * ovenPerBlock * pool.allocPoint / (totalAllocPoint);
+            accOvenPerShare = (accOvenPerShare + ovenReward * 1e12) / lpSupply;
         }
-        return user.amount.mul(accOvenPerShare).div(1e12).sub(user.rewardDebt);
+        return user.amount * accOvenPerShare / 1e12 - user.rewardDebt;
     }
 
     // UPDATE -- REWARD VARIABLES FOR ALL POOLS (HIGH GAS POSSIBLE) -- PUBLIC
@@ -238,15 +232,14 @@ contract MasterChef is Ownable {
         }
         uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
         uint256 ovenReward = 
-            multiplier.mul(ovenPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
+            multiplier * ovenPerBlock * pool.allocPoint / totalAllocPoint;
 
-        oven.mint(admin, ovenReward.mul(15).div(130)); // 1.5 OVEN per block to admin
-        oven.mint(treasury, ovenReward.mul(15).div(130)); // 1.5 OVEN per block to treasury
+        oven.mint(team, ovenReward * 15 / 130); // 1.5 OVEN per block to team
+        oven.mint(treasury, ovenReward * 15 / 130); // 1.5 OVEN per block to treasury
         
         oven.mint(address(sugar), ovenReward);
 
-        pool.accOvenPerShare = pool.accOvenPerShare.add(
-            ovenReward.mul(1e12).div(lpSupply));
+        pool.accOvenPerShare = pool.accOvenPerShare + (ovenReward * 1e12 / lpSupply);
 
         pool.lastRewardBlock = block.number;
     }
@@ -260,17 +253,17 @@ contract MasterChef is Ownable {
         UserInfo storage user = userInfo[_pid][msg.sender];
         updatePool(_pid);
         if (user.amount > 0) { // already deposited assets
-            uint256 pending = user.amount.mul(pool.accOvenPerShare).div(1e12).sub(user.rewardDebt);
+            uint256 pending = user.amount * pool.accOvenPerShare / 1e12 - user.rewardDebt;
             if(pending > 0) { // sends pending rewards, if applicable
                 safeOvenTransfer(msg.sender, pending);
             }
         }
 
         if (_amount > 0) { // if adding more
-            pool.lpToken.safeTransferFrom(address(msg.sender), address(this), _amount);
-            user.amount = user.amount.add(_amount);
+            pool.lpToken.transferFrom(address(msg.sender), address(this), _amount);
+            user.amount = user.amount + _amount;
         }
-        user.rewardDebt = user.amount.mul(pool.accOvenPerShare).div(1e12);
+        user.rewardDebt = user.amount * pool.accOvenPerShare / 1e12;
         emit Deposit(msg.sender, _pid, _amount);
     }
 
@@ -283,15 +276,15 @@ contract MasterChef is Ownable {
         require(user.amount >= _amount, "withdraw: not good");
 
         updatePool(_pid);
-        uint256 pending = user.amount.mul(pool.accOvenPerShare).div(1e12).sub(user.rewardDebt);
+        uint256 pending = user.amount * pool.accOvenPerShare / 1e12 - user.rewardDebt;
         if(pending > 0) {
             safeOvenTransfer(msg.sender, pending);
         }
         if(_amount > 0) {
-            user.amount = user.amount.sub(_amount);
-            pool.lpToken.safeTransfer(address(msg.sender), _amount);
+            user.amount = user.amount - _amount;
+            pool.lpToken.transfer(address(msg.sender), _amount);
         }
-        user.rewardDebt = user.amount.mul(pool.accOvenPerShare).div(1e12);
+        user.rewardDebt = user.amount * pool.accOvenPerShare / 1e12;
         emit Withdraw(msg.sender, _pid, _amount);
     }
 
@@ -301,16 +294,16 @@ contract MasterChef is Ownable {
         UserInfo storage user = userInfo[0][msg.sender];
         updatePool(0);
         if (user.amount > 0) {
-            uint256 pending = user.amount.mul(pool.accOvenPerShare).div(1e12).sub(user.rewardDebt);
+            uint256 pending = user.amount * pool.accOvenPerShare/ 1e12 - user.rewardDebt;
             if(pending > 0) {
                 safeOvenTransfer(msg.sender, pending);
             }
         }
         if(_amount > 0) {
-            pool.lpToken.safeTransferFrom(address(msg.sender), address(this), _amount);
-            user.amount = user.amount.add(_amount);
+            pool.lpToken.transferFrom(address(msg.sender), address(this), _amount);
+            user.amount = user.amount + _amount;
         }
-        user.rewardDebt = user.amount.mul(pool.accOvenPerShare).div(1e12);
+        user.rewardDebt = user.amount * pool.accOvenPerShare / 1e12;
 
         sugar.mint(msg.sender, _amount);
         emit Deposit(msg.sender, 0, _amount);
@@ -322,15 +315,15 @@ contract MasterChef is Ownable {
         UserInfo storage user = userInfo[0][msg.sender];
         require(user.amount >= _amount, "withdraw: not good");
         updatePool(0);
-        uint256 pending = user.amount.mul(pool.accOvenPerShare).div(1e12).sub(user.rewardDebt);
+        uint256 pending = user.amount * pool.accOvenPerShare / 1e12 - user.rewardDebt;
         if(pending > 0) {
             safeOvenTransfer(msg.sender, pending);
         }
         if(_amount > 0) {
-            user.amount = user.amount.sub(_amount);
-            pool.lpToken.safeTransfer(address(msg.sender), _amount);
+            user.amount = user.amount - _amount;
+            pool.lpToken.transfer(address(msg.sender), _amount);
         }
-        user.rewardDebt = user.amount.mul(pool.accOvenPerShare).div(1e12);
+        user.rewardDebt = user.amount * (pool.accOvenPerShare / 1e12);
 
         sugar.burn(msg.sender, _amount);
         emit Withdraw(msg.sender, 0, _amount);
@@ -341,15 +334,15 @@ contract MasterChef is Ownable {
         sugar.safeOvenTransfer(_to, _amount);
     }
 
-    // UPDATE -- TREASURY ADDRESS -- TREASURY || ADMIN
+    // UPDATE -- TREASURY ADDRESS -- TREASURY || TEAM
     function newTreasury(address _treasury) public {
-        require(msg.sender == treasury || msg.sender == admin, "treasury: invalid permissions");
+        require(msg.sender == treasury || msg.sender == team, "treasury: invalid permissions");
         treasury = _treasury;
     }
 
     // UPDATE -- ADMIN ADDRESS -- ADMIN
-    function newAdmin(address _admin) public {
-        require(msg.sender == admin, "admin: le who are you?");
-        admin = _admin;
+    function newTeam(address _team) public {
+        require(msg.sender == team, "team: le who are you?");
+        team = _team;
     }
 }

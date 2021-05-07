@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity ^0.8.0;
 
 interface IERC20 {
     /**
@@ -122,5 +122,5 @@ contract EasyBakeVoterProxy {
         return IERC20(votes).balanceOf(_voter);
     }
 
-    constructor() public {}
+    constructor() {}
 }
