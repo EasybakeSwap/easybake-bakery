@@ -9,20 +9,16 @@ import "./OvenToken.sol";
 import "./SugarBar.sol";
 
 interface IMigratorChef {
-    // Perform LP token migration from legacy EasyBakeSwap.
+    // Perform LP token migration from legacy swap.
     // Take the current LP token address and return the new LP token address.
     // Migrator should have full access to the caller's LP token.
     // Return the new LP token address.
-    //
-    // XXX Migrator must have allowance access to DOUGH LP tokens.
-    // EasyBakeSwap must mint EXACTLY the same amount of DOUGH LP tokens or
-    // else something bad will happen. Traditional EasyBakeSwap does not
-    // do that so be careful!
+
     function migrate(IERC20 token) external returns (IERC20);
 }
 
 // MasterChef is the master of Oven. She can make Oven and she is a fair lady.
-//
+
 // Note that it's ownable and the owner wields tremendous power. The ownership
 // will be transferred to a governance smart contract once OVEN is sufficiently
 // distributed and the community can show to govern itself.
@@ -40,7 +36,7 @@ contract MasterChef is Ownable {
         //   pending reward = (user.amount * pool.accOvenPerShare) - user.rewardDebt
 
         // Whenever a user deposits or withdraws LP tokens to a pool. Here's what happens:
-        //   1. The pool's `accOvenPerShare` (and `lastRewardBlock`) gets updated.
+        //   1. The pool's `accOvenPerShare` (and `lastRewardTime`) gets updated.
         //   2. User receives the pending reward sent to their address.
         //   3. User's `amount` gets updated.
         //   4. User's `rewardDebt` gets updated.
@@ -49,8 +45,8 @@ contract MasterChef is Ownable {
     // Info of each pool.
     struct PoolInfo {
         IERC20 lpToken;           // Address of LP token contract.
-        uint256 allocPoint;       // How many allocation points assigned to this pool. OVENs to distribute per block.
-        uint256 lastRewardBlock;  // Last block number that OVENs distribution occurs.
+        uint256 allocPoint;       // How many allocation points assigned to this pool. OVENs to distribute per second.
+        uint256 lastRewardTime;  // Most recent UNIX timestamp that OVENs distribution occurs.
         uint256 accOvenPerShare; // Accumulated OVENs per share, times 1e12. See below.
     }
 
@@ -60,9 +56,9 @@ contract MasterChef is Ownable {
     OvenToken public oven;
     // The SUGAR TOKEN!
     SugarBar public sugar;
-    // Team address, which recieves 1.5 OVEN per block
+    // Team address, which recieves 10% of OVEN per second
     address public team;
-    // Treasury address, which recieves 1.5 OVEN per block
+    // Treasury address, which recieves 10% of OVEN per second
     address public treasury;
     // The migrator contract. It has a lot of power. Can only be set through governance (owner).
     IMigratorChef public migrator;
@@ -70,12 +66,16 @@ contract MasterChef is Ownable {
 
     // ** GLOBAL VARIABLES ** //
 
-    // OVEN tokens created per block.
-    uint256 public ovenPerBlock;
-    // Bonus muliplier for early oven makers.
+    // Blockchains containing MasterChef contract
+    uint32 public chains = 1;
+    // OVEN per DAY
+    uint256 public dailyOven; 
+    // OVEN tokens created per second.
+    uint256 public ovenPerSecond = dailyOven / 86400;
+    // Bonus muliplier for early oven bakers.
     uint256 public BONUS_MULTIPLIER = 1;
-    // The block number when OVEN mining starts.
-    uint256 public startBlock;
+    // The UNIX timestamp when OVEN mining starts.
+    uint256 public startTime;
     // Total allocation points. Must be the sum of all allocation points in all pools.
     uint256 public totalAllocPoint = 0;
 
@@ -94,21 +94,21 @@ contract MasterChef is Ownable {
         SugarBar _sugar,
         address _team,
         address _treasury,
-        uint256 _ovenPerBlock,
-        uint256 _startBlock
+        uint256 _dailyOven,
+        uint256 _startTime
     ) {
         oven = _oven;
         sugar = _sugar;
         team = _team;
         treasury = _treasury;
-        ovenPerBlock = _ovenPerBlock;
-        startBlock = _startBlock;
+        dailyOven = _dailyOven;
+        startTime = _startTime;
 
         // staking pool
         poolInfo.push(PoolInfo({
             lpToken: _oven,
             allocPoint: 1000,
-            lastRewardBlock: startBlock,
+            lastRewardTime: startTime,
             accOvenPerShare: 0
         }));
 
@@ -120,29 +120,31 @@ contract MasterChef is Ownable {
         BONUS_MULTIPLIER = multiplierNumber;
     }
 
+    function updateRewards() internal {
+        dailyOven = dailyOven / chains;
+    }
+
+    function updateChains(uint32 _chains) public onlyOwner {
+        chains = _chains;
+        updateRewards();
+    }
+
     function poolLength() external view returns (uint256) {
         return poolInfo.length;
     }
 
-    // VALIDATION -- ELIMINATES POOL DUPLICATION RISK -- NONE
-    function checkPoolDuplicate(IERC20 _token) public view {
-        uint256 length = poolInfo.length;
-        for (uint256 pid = 0; pid < length; ++pid) {
-            require(poolInfo[pid].lpToken != _token, "add: existing pool?");
-        }
-    }
-
     // ADD -- NEW LP TOKEN POOL -- OWNER
     function add(uint256 _allocPoint, IERC20 _lpToken, bool _withUpdate) public onlyOwner {
+        
         if (_withUpdate) {
             massUpdatePools();
         }
-        uint256 lastRewardBlock = block.number > startBlock ? block.number : startBlock;
+        uint256 lastRewardTime = block.timestamp > startTime ? block.timestamp : startTime;
         totalAllocPoint = totalAllocPoint + _allocPoint;
         poolInfo.push(PoolInfo({
             lpToken: _lpToken,
             allocPoint: _allocPoint,
-            lastRewardBlock: lastRewardBlock,
+            lastRewardTime: lastRewardTime,
             accOvenPerShare: 0
         }));
         updateStakingPool();
@@ -203,12 +205,12 @@ contract MasterChef is Ownable {
         UserInfo storage user = userInfo[_pid][_user];
         uint256 accOvenPerShare = pool.accOvenPerShare;
         uint256 lpSupply = pool.lpToken.balanceOf(address(this));
-        if (block.number > pool.lastRewardBlock && lpSupply != 0) {
-            uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
-            uint256 ovenReward = multiplier * ovenPerBlock * pool.allocPoint / (totalAllocPoint);
+        if (block.timestamp > pool.lastRewardTime && lpSupply != 0) {
+            uint256 multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
+            uint256 ovenReward = multiplier * ovenPerSecond * pool.allocPoint / (totalAllocPoint);
             accOvenPerShare = (accOvenPerShare + ovenReward * 1e12) / lpSupply;
         }
-        return user.amount * accOvenPerShare / 1e12 - user.rewardDebt;
+        return (user.amount * accOvenPerShare) / (1e12 - user.rewardDebt);
     }
 
     // UPDATE -- REWARD VARIABLES FOR ALL POOLS (HIGH GAS POSSIBLE) -- PUBLIC
@@ -222,26 +224,26 @@ contract MasterChef is Ownable {
     // UPDATE -- REWARD VARIABLES (POOL) -- PUBLIC
     function updatePool(uint256 _pid) public {
         PoolInfo storage pool = poolInfo[_pid];
-        if (block.number <= pool.lastRewardBlock) {
+        if (block.timestamp <= pool.lastRewardTime) {
             return;
         }
         uint256 lpSupply = pool.lpToken.balanceOf(address(this));
         if (lpSupply == 0) {
-            pool.lastRewardBlock = block.number;
+            pool.lastRewardTime = block.timestamp;
             return;
         }
-        uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
+        uint256 bonusMultiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
         uint256 ovenReward = 
-            multiplier * ovenPerBlock * pool.allocPoint / totalAllocPoint;
+            bonusMultiplier * ovenPerSecond * pool.allocPoint / totalAllocPoint;
 
-        oven.mint(team, ovenReward * 15 / 130); // 1.5 OVEN per block to team
-        oven.mint(treasury, ovenReward * 15 / 130); // 1.5 OVEN per block to treasury
+        oven.mint(team, ovenReward / 8); // 1.5 OVEN per second to team
+        oven.mint(treasury, ovenReward / 8); // 1.5 OVEN per second to treasury
         
         oven.mint(address(sugar), ovenReward);
 
         pool.accOvenPerShare = pool.accOvenPerShare + (ovenReward * 1e12 / lpSupply);
 
-        pool.lastRewardBlock = block.number;
+        pool.lastRewardTime = block.timestamp;
     }
 
     // DEPOSIT -- LP TOKENS -- LP OWNERS

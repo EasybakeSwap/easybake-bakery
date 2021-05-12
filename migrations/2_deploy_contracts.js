@@ -1,8 +1,9 @@
 const OvenToken = artifacts.require('OvenToken.sol');
 const MasterChef = artifacts.require('MasterChef.sol');
 const SugarBar = artifacts.require('SugarBar.sol');
+const OvenVault = artifacts.require('OvenVault.sol');
 
-module.exports = async function(deployer, addresses) {
+module.exports = async function(deployer) {
 
   // Deploy Oven Token Contract
   await deployer.deploy(OvenToken)
@@ -17,16 +18,27 @@ module.exports = async function(deployer, addresses) {
     MasterChef,
     ovenToken.address,
     sugarToken.address,
-    addresses[0], //  process.env.ADMIN_ADDRESS, // Your address where you get OVEN tokens - should be a multisig
-    addresses[0], //  process.env.TREASURY_ADDRESS, // Your address where you collect fees - should be a multisig
-    web3.utils.toWei(process.env.TOKENS_PER_BLOCK), // Number of tokens rewarded per block, e.g., 100
-    process.env.START_BLOCK // Block number when token mining starts
+    process.env.ADMIN_ADDRESS, // Your address where you get OVEN tokens - should be a multisig
+    process.env.TREASURY_ADDRESS, // Your address where you collect fees - should be a multisig
+    250000, // process.env.DAILY_OVEN, // Daily OVEN emissions
+    '1620819000', // process.env.START_TIME, // Block timestamp when token baking begins
   )
- 
-// Make MasterChef contract token owner for ovenToken and sugarToken
   const masterChef = await MasterChef.deployed()
+
+// Deploy OvenVault Contract
+await deployer.deploy(
+  OvenVault,
+  ovenToken.address, // TOKEN
+  sugarToken.address, // RECEIPT TOKEN
+  masterChef.address, // MASTERCHEF
+  process.env.ADMIN_ADDRESS, // Your address where you get OVEN tokens - should be a multisig
+  process.env.TREASURY_ADDRESS, // Your address where you collect fees - should be a multisig
+)
+
+  // Make MasterChef contract token owner for ovenToken and sugarToken
   await ovenToken.transferOwnership(masterChef.address)
   await sugarToken.transferOwnership(masterChef.address)
+
 
 // // // ADD | Bakery Pools | RINKEBY
 //   await masterChef.add(
