@@ -69,7 +69,7 @@ contract MasterChef is Ownable {
     // Blockchains containing MasterChef contract
     uint32 public chains = 1;
     // OVEN per DAY
-    uint256 public dailyOven; 
+    uint256 public dailyOven = 250000; 
     // OVEN tokens created per second.
     uint256 public ovenPerSecond = dailyOven / 86400;
     // Bonus muliplier for early oven bakers.
@@ -94,14 +94,12 @@ contract MasterChef is Ownable {
         SugarBar _sugar,
         address _team,
         address _treasury,
-        uint256 _dailyOven,
         uint256 _startTime
     ) {
         oven = _oven;
         sugar = _sugar;
         team = _team;
         treasury = _treasury;
-        dailyOven = _dailyOven;
         startTime = _startTime;
 
         // staking pool
@@ -122,6 +120,7 @@ contract MasterChef is Ownable {
 
     function updateRewards() internal {
         dailyOven = dailyOven / chains;
+        ovenPerSecond = dailyOven / 86400;
     }
 
     function updateChains(uint32 _chains) public onlyOwner {
@@ -236,8 +235,8 @@ contract MasterChef is Ownable {
         uint256 ovenReward = 
             bonusMultiplier * ovenPerSecond * pool.allocPoint / totalAllocPoint;
 
-        oven.mint(team, ovenReward / 8); // 1.5 OVEN per second to team
-        oven.mint(treasury, ovenReward / 8); // 1.5 OVEN per second to treasury
+        oven.mint(team, ovenReward / 8); // 12.5% OVEN per second to team
+        oven.mint(treasury, ovenReward / 8); // 12.5% OVEN per second to treasury
         
         oven.mint(address(sugar), ovenReward);
 

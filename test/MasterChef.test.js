@@ -41,12 +41,12 @@ contract('MasterChef', ([alice, bob, team, treasury, minter]) => {
       await this.chef.add('100', this.lp3.address, true, { from: minter });
       assert.equal((await this.chef.poolLength()).toString(), "10");
 
-      await time.advanceBlockTo('170');
+      await time.increase('70');
       await this.lp1.approve(this.chef.address, '1000', { from: alice });
       assert.equal((await this.oven.balanceOf(alice)).toString(), '0');
       await this.chef.deposit(1, '20', { from: alice });
       await this.chef.withdraw(1, '20', { from: alice });
-      assert.equal((await this.oven.balanceOf(alice)).toString(), '263');
+      assert.equal((await this.oven.balanceOf(alice)).toString(), '63');
 
       await this.oven.approve(this.chef.address, '1000', { from: alice });
       await this.chef.enterStaking('20', { from: alice });
@@ -133,7 +133,7 @@ contract('MasterChef', ([alice, bob, team, treasury, minter]) => {
       assert.equal((await this.oven.balanceOf(alice)).toString(), '54491');
       assert.equal((await this.oven.balanceOf(bob)).toString(), '150858');
 
-      await time.advanceBlockTo('265');
+      await time.increase('50');
 
       await this.chef.enterStaking('0', { from: alice });
       await this.chef.enterStaking('0', { from: bob });

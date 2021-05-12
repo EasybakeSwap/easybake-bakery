@@ -8,6 +8,7 @@ module.exports = async function(deployer) {
   // Deploy Oven Token Contract
   await deployer.deploy(OvenToken)
   const ovenToken = await OvenToken.deployed()
+  await ovenToken.mint(process.env.ADMIN_ADDRESS, web3.utils.toWei('50000000', 'gwei'))
 
   // Deploy Sugar Token Contract
   await deployer.deploy(SugarBar, ovenToken.address)
@@ -20,7 +21,6 @@ module.exports = async function(deployer) {
     sugarToken.address,
     process.env.ADMIN_ADDRESS, // Your address where you get OVEN tokens - should be a multisig
     process.env.TREASURY_ADDRESS, // Your address where you collect fees - should be a multisig
-    250000, // process.env.DAILY_OVEN, // Daily OVEN emissions
     '1620819000', // process.env.START_TIME, // Block timestamp when token baking begins
   )
   const masterChef = await MasterChef.deployed()
