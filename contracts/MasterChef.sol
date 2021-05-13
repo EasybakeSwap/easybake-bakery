@@ -206,7 +206,7 @@ contract MasterChef is Ownable {
         uint256 lpSupply = pool.lpToken.balanceOf(address(this));
         if (block.timestamp > pool.lastRewardTime && lpSupply != 0) {
             uint256 multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
-            uint256 ovenReward = multiplier * ovenPerSecond * pool.allocPoint / (totalAllocPoint);
+            uint256 ovenReward = multiplier * (ovenPerSecond / chains) * pool.allocPoint / (totalAllocPoint); // added .div(chains) to equation
             accOvenPerShare = (accOvenPerShare + ovenReward * 1e12) / lpSupply;
         }
         return (user.amount * accOvenPerShare) / (1e12 - user.rewardDebt);
