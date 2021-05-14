@@ -1,8 +1,8 @@
-// File: @openzeppelin/contracts/utils/Context.sol
-
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
+
+// File: @openzeppelin/contracts/utils/Context.sol
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -26,8 +26,6 @@ abstract contract Context {
 }
 
 // File: @openzeppelin/contracts/access/Ownable.sol
-
-// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -96,8 +94,6 @@ abstract contract Ownable is Context {
 }
 
 // File: @openzeppelin/contracts/token/ERC20/IERC20.sol
-
-// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -176,8 +172,6 @@ interface IERC20 {
 }
 
 // File: @openzeppelin/contracts/utils/Address.sol
-
-// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -369,8 +363,6 @@ library Address {
 
 // File: @openzeppelin/contracts/security/Pausable.sol
 
-// SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.0;
 
 
@@ -461,8 +453,6 @@ abstract contract Pausable is Context {
 
 // File: contracts/libs/IMasterChef.sol
 
-// SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.0;
 
 interface IMasterChef {
@@ -483,15 +473,7 @@ interface IMasterChef {
 
 // File: contracts/OvenVault.sol
 
-// SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.0;
-
-
-
-
-
-
 
 pragma solidity ^0.8.0;
 
