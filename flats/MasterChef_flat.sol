@@ -105,6 +105,8 @@ abstract contract Context {
 
 // File: @openzeppelin/contracts/access/Ownable.sol
 
+// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.0;
 
 /**
@@ -175,7 +177,6 @@ abstract contract Ownable is Context {
 
 pragma solidity ^0.8.0;
 
-
 /**
  * @dev Interface for the optional metadata functions from the ERC20 standard.
  *
@@ -201,9 +202,6 @@ interface IERC20Metadata is IERC20 {
 // File: @openzeppelin/contracts/token/ERC20/ERC20.sol
 
 pragma solidity ^0.8.0;
-
-
-
 
 /**
  * @dev Implementation of the {IERC20} interface.
@@ -504,7 +502,6 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
 
 // File: contracts/OvenToken.sol
 
-
 pragma solidity ^0.8.0;
 
 // OvenToken with Governance.
@@ -749,9 +746,6 @@ contract OvenToken is ERC20('Oven Token', 'OVEN'), Ownable {
 // File: contracts/SugarBar.sol
 
 pragma solidity ^0.8.0;
-
-
-
 
 // SugarBar with Governance.
 contract SugarBar is ERC20('SugarBar Token', 'SUGAR'), Ownable {
@@ -1078,9 +1072,9 @@ contract MasterChef is Ownable {
     // ** GLOBAL VARIABLES ** //
 
     // Blockchains containing MasterChef contract
-    uint32 public chains = 1;
+    uint256 public chains = 1;
     // OVEN per DAY
-    uint256 public dailyOven = 250000; 
+    uint256 public dailyOven = 250000 * 1e18; 
     // OVEN tokens created per second.
     uint256 public ovenPerSecond = dailyOven / 86400;
     // Bonus muliplier for early oven bakers.
@@ -1130,11 +1124,12 @@ contract MasterChef is Ownable {
     }
 
     function updateRewards() internal {
-        dailyOven = dailyOven / chains;
+        dailyOven = (250000 * 1e18) / chains;
         ovenPerSecond = dailyOven / 86400;
     }
 
-    function updateChains(uint32 _chains) public onlyOwner {
+    function updateChains(uint256 _chains) public onlyOwner {
+        require(_chains != 0, 'chain cannot be zero');
         chains = _chains;
         updateRewards();
     }
@@ -1217,10 +1212,10 @@ contract MasterChef is Ownable {
         uint256 lpSupply = pool.lpToken.balanceOf(address(this));
         if (block.timestamp > pool.lastRewardTime && lpSupply != 0) {
             uint256 multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
-            uint256 ovenReward = multiplier * (ovenPerSecond / chains) * pool.allocPoint / (totalAllocPoint); // added .div(chains) to equation
-            accOvenPerShare = (accOvenPerShare + ovenReward * 1e12) / lpSupply;
+            uint256 ovenReward = (multiplier * ovenPerSecond * pool.allocPoint) / totalAllocPoint;
+            accOvenPerShare = accOvenPerShare + (ovenReward * 1e12 / lpSupply);
         }
-        return (user.amount * accOvenPerShare) / (1e12 - user.rewardDebt);
+        return user.amount * accOvenPerShare / 1e12 - user.rewardDebt;
     }
 
     // UPDATE -- REWARD VARIABLES FOR ALL POOLS (HIGH GAS POSSIBLE) -- PUBLIC
@@ -1242,9 +1237,9 @@ contract MasterChef is Ownable {
             pool.lastRewardTime = block.timestamp;
             return;
         }
-        uint256 bonusMultiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
+        uint256 multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
         uint256 ovenReward = 
-            bonusMultiplier * ovenPerSecond * pool.allocPoint / totalAllocPoint;
+            (multiplier * ovenPerSecond * pool.allocPoint) / totalAllocPoint;
 
         oven.mint(team, ovenReward / 8); // 12.5% OVEN per second to team
         oven.mint(treasury, ovenReward / 8); // 12.5% OVEN per second to treasury
@@ -1265,7 +1260,7 @@ contract MasterChef is Ownable {
         UserInfo storage user = userInfo[_pid][msg.sender];
         updatePool(_pid);
         if (user.amount > 0) { // already deposited assets
-            uint256 pending = user.amount * pool.accOvenPerShare / 1e12 - user.rewardDebt;
+            uint256 pending = (user.amount * pool.accOvenPerShare) / 1e12 - user.rewardDebt;
             if(pending > 0) { // sends pending rewards, if applicable
                 safeOvenTransfer(msg.sender, pending);
             }
@@ -1335,7 +1330,7 @@ contract MasterChef is Ownable {
             user.amount = user.amount - _amount;
             pool.lpToken.transfer(address(msg.sender), _amount);
         }
-        user.rewardDebt = user.amount * (pool.accOvenPerShare / 1e12);
+        user.rewardDebt = user.amount * pool.accOvenPerShare / 1e12;
 
         sugar.burn(msg.sender, _amount);
         emit Withdraw(msg.sender, 0, _amount);

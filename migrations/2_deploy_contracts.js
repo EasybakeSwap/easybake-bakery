@@ -8,7 +8,7 @@ module.exports = async function(deployer) {
   // Deploy Oven Token Contract
   await deployer.deploy(OvenToken)
   const ovenToken = await OvenToken.deployed()
-  await ovenToken.mint(process.env.ADMIN_ADDRESS, web3.utils.toWei('50000000', 'gwei'))
+  await ovenToken.mint(process.env.ADMIN_ADDRESS, web3.utils.toWei('50000000000000000', 'gwei'))
 
   // Deploy Sugar Token Contract
   await deployer.deploy(SugarBar, ovenToken.address)
