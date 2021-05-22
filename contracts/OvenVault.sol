@@ -1,5 +1,12 @@
 // SPDX-License-Identifier: MIT
 
+/**
+    OvenVault stakes everyone's OVEN (as a single entity) & distributes the rewards accordingly to 
+    the user's share of the total stake, calculated with the same logic as MasterChef.
+
+    The user needs to approve the contract address with OVEN `allowance()` in order to deposit.
+ */
+
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts/utils/Context.sol';
@@ -92,7 +99,7 @@ contract OvenVault is Ownable, Pausable {
 
     /**
      * @notice Deposits funds into the Oven Vault
-     * @dev Only possible when contract not paused.
+     * @dev Only possible when contract not paused & user has approved tokens for transferFrom.
      * @param _amount: number of tokens to deposit (in OVEN)
      */
     function deposit(uint256 _amount) external whenNotPaused notContract {
@@ -113,7 +120,7 @@ contract OvenVault is Ownable, Pausable {
 
         totalShares = totalShares + currentShares;
 
-        user.ovenAtLastUserAction = user.shares * (balanceOf()) / totalShares;
+        user.ovenAtLastUserAction = (user.shares * balanceOf()) / totalShares;
         user.lastUserActionTime = block.timestamp;
 
         _earn();
@@ -122,7 +129,7 @@ contract OvenVault is Ownable, Pausable {
     }
 
     /**
-     * @notice Withdraws all funds for a user
+     * @notice Withdraws all funds for the caller
      */
     function withdrawAll() external notContract {
         withdraw(userInfo[msg.sender].shares);
@@ -317,8 +324,8 @@ contract OvenVault is Ownable, Pausable {
     }
 
     /**
-     * @notice Custom logic for how much the vault allows to be borrowed
-     * @dev The contract puts 100% of the tokens to work.
+     * @notice Checks the total OVEN deposited by users
+     * @dev The contract staked the total OVEN deposited
      */
     function available() public view returns (uint256) {
         return token.balanceOf(address(this));
@@ -345,7 +352,7 @@ contract OvenVault is Ownable, Pausable {
 
     /**
      * @notice Checks if address is a contract
-     * @dev It prevents contract from being targetted
+     * @dev It prevents contract from being targeted
      */
     function _isContract(address addr) internal view returns (bool) {
         uint256 size;
