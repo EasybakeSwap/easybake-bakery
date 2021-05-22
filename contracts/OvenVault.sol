@@ -264,7 +264,7 @@ contract OvenVault is Ownable, Pausable {
 
     /**
      * @notice Calculates the total pending rewards that can be restaked
-     * @return Returns total pending oven rewards
+     * @return Returns total pending OVEN rewards
      */
     function calculateTotalPendingOvenRewards() external view returns (uint256) {
         uint256 amount = IMasterChef(masterchef).pendingOven(0, address(this));
