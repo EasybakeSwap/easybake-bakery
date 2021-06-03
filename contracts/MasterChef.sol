@@ -2,10 +2,12 @@
 
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import '@openzeppelin/contracts/access/Ownable.sol';
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import "./OvenToken.sol";
+import "./OvenToken.sol";   
 import "./SugarBar.sol";
 
 interface IMigratorChef {
@@ -27,7 +29,7 @@ interface IMigratorChef {
 // will be transferred to a governance smart contract once OVEN is sufficiently
 // distributed and the community can show to govern itself.
 
-contract MasterChef is Ownable {
+contract MasterChef is Initializable, OwnableUpgradeable {
 
     // Info of each user.
     struct UserInfo {
@@ -73,11 +75,11 @@ contract MasterChef is Ownable {
     // OVEN tokens created per block.
     uint256 public ovenPerBlock;
     // Bonus muliplier for early oven makers.
-    uint256 public BONUS_MULTIPLIER = 1;
+    uint256 public BONUS_MULTIPLIER;
     // The block number when OVEN mining starts.
     uint256 public startBlock;
     // Total allocation points. Must be the sum of all allocation points in all pools.
-    uint256 public totalAllocPoint = 0;
+    uint256 public totalAllocPoint;
 
     // ** POOL VARIABLES ** //
 
@@ -89,20 +91,27 @@ contract MasterChef is Ownable {
     event Deposit(address indexed user, uint256 indexed pid, uint256 amount);
     event Withdraw(address indexed user, uint256 indexed pid, uint256 amount);
 
-    constructor(
+    function initialize(
         OvenToken _oven,
         SugarBar _sugar,
         address _team,
         address _treasury,
         uint256 _ovenPerBlock,
         uint256 _startBlock
-    ) {
+    )public virtual initializer {
+
+        __Pausable_init();
+        __Ownable_init();
         oven = _oven;
         sugar = _sugar;
         team = _team;
         treasury = _treasury;
         ovenPerBlock = _ovenPerBlock;
         startBlock = _startBlock;
+
+        // moved global declaration here
+        BONUS_MULTIPLIER = 1;
+        totalAllocPoint = 0;
 
         // staking pool
         poolInfo.push(PoolInfo({
@@ -344,5 +353,20 @@ contract MasterChef is Ownable {
     function newTeam(address _team) public {
         require(msg.sender == team, "team: le who are you?");
         team = _team;
+    }
+
+ /// @notice SECURITY.
+
+    /// @notice pause or unpause.
+    /// @dev Security feature to use with Defender
+
+    function pause() public whenNotPaused{
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Unauthorized to pause");
+        _pause();
+    }
+    
+    function unpause() public whenPaused{
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Unauthorized to unpause");
+        _unpause();
     }
 }
