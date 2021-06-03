@@ -29,7 +29,7 @@ interface IMigratorChef {
 // will be transferred to a governance smart contract once OVEN is sufficiently
 // distributed and the community can show to govern itself.
 
-contract MasterChef is Initializable, OwnableUpgradeable {
+contract MasterChef is Initializable, OwnableUpgradeable, PausableUpgradeable {
 
     // Info of each user.
     struct UserInfo {
@@ -360,13 +360,13 @@ contract MasterChef is Initializable, OwnableUpgradeable {
     /// @notice pause or unpause.
     /// @dev Security feature to use with Defender
 
-    function pause() public whenNotPaused{
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Unauthorized to pause");
+    function pause() public whenNotPaused onlyOwner{
+     
         _pause();
     }
     
-    function unpause() public whenPaused{
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Unauthorized to unpause");
+    function unpause() public whenPaused onlyOwner{
+      
         _unpause();
     }
 }
