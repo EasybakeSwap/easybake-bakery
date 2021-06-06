@@ -1,4 +1,5 @@
 const { expectRevert, time } = require('@openzeppelin/test-helpers');
+const { BigNumber } = require('ethers');
 const OvenToken = artifacts.require('OvenToken');
 const SugarBar = artifacts.require('SugarBar');
 const MasterChef = artifacts.require('MasterChef');
@@ -11,7 +12,7 @@ contract('MasterChef', ([alice, bob, team, treasury, minter]) => {
         this.lp1 = await MockERC20.new('LPToken', 'LP1', '1000000', { from: minter });
         this.lp2 = await MockERC20.new('LPToken', 'LP2', '1000000', { from: minter });
         this.lp3 = await MockERC20.new('LPToken', 'LP3', '1000000', { from: minter });
-        this.chef = await MasterChef.new(this.oven.address, this.sugar.address, team, treasury, '1000', '100', { from: minter });
+        this.chef = await MasterChef.new(this.oven.address, this.sugar.address, team, treasury, await time.latest(), { from: minter });
         await this.oven.transferOwnership(this.chef.address, { from: minter });
         await this.sugar.transferOwnership(this.chef.address, { from: minter });
 
